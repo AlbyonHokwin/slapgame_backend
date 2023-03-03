@@ -26,6 +26,11 @@ app.get('/', (req: Request, res: Response) => {
     res.send('Express server for slapgame');
 });
 
-io.on('connection', (socket) => console.log('user connected'));
+io.on('connection', (socket) => {
+    console.log('user connected');
+    socket.on('disconnect', () => {
+        console.log('user disconnected');
+    });
+});
 
 server.listen(port, () => console.log(`listening on ${port}`));
