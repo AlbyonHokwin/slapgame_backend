@@ -5,6 +5,7 @@ import { Server as ioServer } from 'socket.io';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
+import routes from './routes/index';
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use('/', routes);
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Express server for slapgame');
