@@ -5,6 +5,6 @@ export const getAll = async () => {
     const games = await db.query('SELECT * FROM games');
     return games.rows;
   } catch (error) {
-    console.log(error);
+    throw error;
   }
 }
