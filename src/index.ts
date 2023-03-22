@@ -3,20 +3,20 @@ import express, { Express, Request, Response } from 'express';
 import http from 'http';
 import { Server as ioServer } from 'socket.io';
 import cors from 'cors';
-import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 import routes from './routes/index';
+import errorsHandler from './middlewares/errorsHandler';
 
 dotenv.config();
 
-const app: Express = express();
-const port: number = parseInt(process.env.PORT || '3000', 10);
+const app = express();
+const port: number = parseInt(process.env.PORT as string || '3000', 10);
 app.set('port', port);
 
-const server: http.Server = http.createServer(app);
+const server = http.createServer(app);
 const io = new ioServer(server);
 
-// middleware
 app.use(cors());
 app.use(helmet());
 app.use(express.json());
@@ -24,7 +24,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use('/', routes);
 
-app.get('/', (req: Request, res: Response) => {
+app.get('/', (_, res: Response) => {
     res.send('Express server for slapgame');
 });
 
@@ -35,4 +35,6 @@ io.on('connection', (socket) => {
     });
 });
 
-server.listen(port, () => console.log(`listening on ${port}`));
+app.use(errorsHandler);
+
+server.listen(port, () => console.log(`listening on port ${port}`));
