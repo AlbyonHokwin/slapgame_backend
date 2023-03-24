@@ -6,6 +6,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import routes from './routes/index';
+import errorsLogger from './middlewares/errorsLogger';
 import errorsHandler from './middlewares/errorsHandler';
 
 dotenv.config();
@@ -35,6 +36,7 @@ io.on('connection', (socket) => {
     });
 });
 
+app.use(errorsLogger);
 app.use(errorsHandler);
 
 server.listen(port, () => console.log(`listening on port ${port}`));
