@@ -6,8 +6,6 @@ const errorsHandler = (err: any, req: Request, res: Response, next: NextFunction
     next(err);
   }
 
-  console.log('here :', err);
-
   if (err instanceof BaseError) {
     return res.status(err.statusCode).json({ error: err.message })
   }
