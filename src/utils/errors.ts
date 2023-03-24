@@ -25,6 +25,12 @@ export class BadRequestError extends BaseError {
   }
 };
 
+export class ConflictRequestError extends BaseError {
+  constructor(message: string) {
+    super(409, message);
+  }
+};
+
 export class FailedValidationError extends BadRequestError {
   errors: ValidationError[];
 
