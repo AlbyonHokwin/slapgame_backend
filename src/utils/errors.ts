@@ -1,3 +1,5 @@
+import type { ValidationError } from 'express-validator';
+
 export abstract class BaseError extends Error {
   statusCode: number;
 
@@ -20,5 +22,13 @@ export class NotFoundError extends BaseError {
 export class BadRequestError extends BaseError {
   constructor(message: string = 'Bad request') {
     super(400, message);
+  }
+};
+
+export class FailedValidationError extends BadRequestError {
+  errors: ValidationError[];
+
+  constructor(errors: ValidationError[]) {
+    super(errors.map(error => error.msg).join(' / '));
   }
 };
