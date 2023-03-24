@@ -34,3 +34,16 @@ export const findOneByEmail = async (email: User['email']): Promise<UserWithId |
     throw error;
   }
 }
+
+export const emailAlreadyUsed = async (email: User['email']): Promise<boolean> => {
+  const statement = 'SELECT id, username, email FROM users WHERE LOWER(email) = $1 LIMIT 1';
+  const values = [email.toLowerCase()];
+
+  try {
+    const results: QueryResult = await db.query(statement, values);
+
+    return results.rows.length > 0;
+  } catch (error) {
+    throw error;
+  }
+}
