@@ -1,7 +1,7 @@
 import { db } from './db';
 import bcrypt from 'bcrypt';
 
-import type { User, UserWithId, UserWithPwd } from '@@/types/User';
+import type { FullUser, User, UserWithId, UserWithPwd } from '@@/types/User';
 
 export const create = async ({ username, email, password }: UserWithPwd): Promise<UserWithId> => {
   const hash: string = await bcrypt.hash(password, parseInt(process.env.BCRYPT_SALT_ROUNDS || '', 10) || 10);
@@ -34,14 +34,14 @@ export const findOneById = async (id: UserWithId['id']): Promise<UserWithId | un
   }
 }
 
-export const findOneByEmail = async (email: User['email']): Promise<UserWithId | undefined> => {
-  const statement = 'SELECT id, username, email FROM users WHERE LOWER(email) = $1 LIMIT 1';
+export const findOneByEmail = async (email: User['email']): Promise<FullUser | undefined> => {
+  const statement = 'SELECT id, username, email, password FROM users WHERE LOWER(email) = $1 LIMIT 1';
   const values = [email.toLowerCase()];
 
   try {
     const results = await db.query(statement, values);
 
-    let foundUser: UserWithId | undefined = undefined;
+    let foundUser: FullUser | undefined = undefined;
 
     results.rows.length > 0 && (foundUser = results.rows[0]);
 
