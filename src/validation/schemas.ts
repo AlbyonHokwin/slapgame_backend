@@ -1,7 +1,7 @@
 import { type ValidationChain, body } from 'express-validator';
 import { checkEmail, checkPassword } from './checks';
 
-export const addUserSchema: ValidationChain[] = [
+export const signupSchema: ValidationChain[] = [
   body('username').exists().withMessage('No username provided').bail()
     .trim().isLength({ min: 3 }).withMessage('Username must be at least 3 characters').bail()
     .isAlphanumeric(undefined, { ignore: ' -.' }).withMessage('Can only contains alphanumeric characters with whitespaces and -'),
@@ -13,9 +13,13 @@ export const addUserSchema: ValidationChain[] = [
     .custom((value, { req }) => value === req.body.password).withMessage('Password confirmation does not match password'),
 ];
 
-export const userSchema: ValidationChain[] = [
+export const signinSchema: ValidationChain[] = [
   checkEmail,
   checkPassword,
+];
+
+export const signoutSchema: ValidationChain[] = [
+  checkEmail,
 ];
 
 export const refreshTokenSchema: ValidationChain[] = [
