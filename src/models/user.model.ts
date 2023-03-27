@@ -34,18 +34,23 @@ export const findOneById = async (id: UserWithId['id']): Promise<UserWithId | un
   }
 }
 
-export const findOneByEmail = async (email: User['email']): Promise<FullUser | undefined> => {
+export const findOneByEmail = async (email: User['email']): Promise<FullUser | null> => {
   const statement = 'SELECT id, username, email, password FROM users WHERE LOWER(email) = $1 LIMIT 1';
   const values = [email.toLowerCase()];
 
   try {
     const results = await db.query(statement, values);
 
-    let foundUser: FullUser | undefined = undefined;
+    if (results.rows.length === 0) return null;
 
-    results.rows.length > 0 && (foundUser = results.rows[0]);
+    const userData = results.rows[0];
 
-    return foundUser;
+    return {
+      id: userData.id,
+      username: userData.username,
+      email: userData.email,
+      password: userData.password,
+    };
   } catch (error) {
     throw error;
   }
