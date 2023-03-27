@@ -43,4 +43,10 @@ export class VerificationTokenError extends BaseError {
   constructor(message: string) {
     super(401, message);
   }
+};
+
+export class AuthorizationError extends BaseError {
+  constructor(message: string = 'Unauthorized') {
+    super(401, message);
+  }
 }
