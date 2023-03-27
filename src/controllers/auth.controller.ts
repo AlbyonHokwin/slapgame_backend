@@ -1,13 +1,14 @@
 import { asyncHandler } from '@/utils/asyncHandler';
-import { AuthorizationError, ConflictRequestError } from '@/utils/errors';
+import { AuthorizationError, BadRequestError, ConflictRequestError, FailedValidationError } from '@/utils/errors';
 import bcrypt from 'bcrypt';
+import { body, validationResult } from 'express-validator';
 import * as User from '../models/user.model';
 import * as RefreshToken from '../models/token.model';
+import { createAccessToken } from '@/utils/createAccessToken';
+import { RefreshToken as RefreshTokenData } from '@@/types/RefreshToken';
 
 import type { Request, Response } from 'express';
 import type { FullUser, UserWithId, UserWithPwd } from '@@/types/User';
-import { createAccessToken } from '@/utils/createAccessToken';
-import { RefreshToken as RefreshTokenData } from '@@/types/RefreshToken';
 
 export const signup = asyncHandler(async (req: Request, res: Response) => {
   const { username, email, password } = req.body;
@@ -34,7 +35,7 @@ export const signup = asyncHandler(async (req: Request, res: Response) => {
 
 export const signin = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body;
-  const user: FullUser | undefined = await User.findOneByEmail(email);
+  const user: FullUser | null = await User.findOneByEmail(email);
 
   if (!user) throw new AuthorizationError('Invalid e-mail or password');
 
@@ -51,6 +52,18 @@ export const signin = asyncHandler(async (req: Request, res: Response) => {
     access_token: accessToken,
     refresh_token: refreshToken,
   });
+});
+
+export const signout = asyncHandler(async (req: Request, res: Response) => {
+  const { email } = req.body;
+
+  const user: FullUser | null = await User.findOneByEmail(email);
+
+  if (!user) throw new BadRequestError('Can\'t logout, please try again with correct e-mail');
+
+  await RefreshToken.revokeAllForId(user.id);
+
+  res.json({ status: 'success' });
 });
 
 export const refreshToken = asyncHandler(async (req: Request, res: Response) => {
