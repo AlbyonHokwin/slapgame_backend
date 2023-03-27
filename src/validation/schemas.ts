@@ -17,3 +17,11 @@ export const userSchema: ValidationChain[] = [
   checkEmail,
   checkPassword,
 ];
+
+export const refreshTokenSchema: ValidationChain[] = [
+  body('grant_type').exists().withMessage('grant_type field is required').bail()
+    .equals('refresh_token'),
+
+  body('refresh_token', 'No token provided').exists().bail()
+    .notEmpty()
+]
