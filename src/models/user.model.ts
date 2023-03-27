@@ -1,5 +1,4 @@
 import { db } from './db';
-import type { QueryResult } from 'pg';
 import bcrypt from 'bcrypt';
 
 import type { User, UserWithId, UserWithPwd } from '@@/types/User';
@@ -11,21 +10,38 @@ export const create = async ({ username, email, password }: UserWithPwd): Promis
   const values = [username, email, hash];
 
   try {
-    const results: QueryResult = await db.query(statement, values);
+    const results = await db.query(statement, values);
     return results.rows[0];
   } catch (error) {
     throw error;
   }
 };
 
-export const findOneByEmail = async (email: User['email']): Promise<UserWithId | {}> => {
+export const findOneById = async (id: UserWithId['id']): Promise<UserWithId | undefined> => {
+  const statement = 'SELECT id, username, email FROM users WHERE id = $1 LIMIT 1';
+  const values = [id];
+
+  try {
+    const results = await db.query(statement, values);
+
+    let foundUser: UserWithId | undefined = undefined;
+
+    results.rows.length > 0 && (foundUser = results.rows[0]);
+
+    return foundUser;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const findOneByEmail = async (email: User['email']): Promise<UserWithId | undefined> => {
   const statement = 'SELECT id, username, email FROM users WHERE LOWER(email) = $1 LIMIT 1';
   const values = [email.toLowerCase()];
 
   try {
-    const results: QueryResult = await db.query(statement, values);
+    const results = await db.query(statement, values);
 
-    let foundUser: UserWithId | {} = {}
+    let foundUser: UserWithId | undefined = undefined;
 
     results.rows.length > 0 && (foundUser = results.rows[0]);
 
@@ -40,7 +56,7 @@ export const emailAlreadyUsed = async (email: User['email']): Promise<boolean> =
   const values = [email.toLowerCase()];
 
   try {
-    const results: QueryResult = await db.query(statement, values);
+    const results = await db.query(statement, values);
 
     return results.rows.length > 0;
   } catch (error) {
