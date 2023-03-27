@@ -7,6 +7,7 @@ import * as RefreshToken from '../models/token.model';
 import type { Request, Response } from 'express';
 import type { FullUser, UserWithId, UserWithPwd } from '@@/types/User';
 import { createAccessToken } from '@/utils/createAccessToken';
+import { RefreshToken as RefreshTokenData } from '@@/types/RefreshToken';
 
 export const signup = asyncHandler(async (req: Request, res: Response) => {
   const { username, email, password } = req.body;
@@ -40,11 +41,10 @@ export const signin = asyncHandler(async (req: Request, res: Response) => {
   const isCorrectPassword = await bcrypt.compare(password, user.password);
   if (!isCorrectPassword) throw new AuthorizationError('Invalid e-mail or password');
 
-  await RefreshToken.revokeAllForId(user.id);
   const refreshToken = await RefreshToken.create(user.id);
   const accessToken = await createAccessToken(user.id);
 
-  res.status(201).json({
+  res.status(200).json({
     status: 'success',
     username: user.username,
     email: user.email,
@@ -54,5 +54,27 @@ export const signin = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const refreshToken = asyncHandler(async (req: Request, res: Response) => {
-  res.json('refreshToken');
+  const { refresh_token: token } = req.body;
+
+  const tokenData: RefreshTokenData | null = await RefreshToken.getOne(token);
+
+  if (!tokenData) throw new AuthorizationError('Token is not valid');
+
+  if (!tokenData.usable) {
+    await RefreshToken.revokeAllForId(tokenData.user_id);
+    throw new AuthorizationError('Token is not valid');
+  }
+
+  await RefreshToken.revokeOne(tokenData.token);
+
+  if (new Date() > tokenData.expires_at) throw new AuthorizationError('Token is not valid');
+
+  const refreshToken = await RefreshToken.create(tokenData.user_id);
+  const accessToken = await createAccessToken(tokenData.user_id);
+
+  res.status(200).json({
+    status: 'success',
+    access_token: accessToken,
+    refresh_token: refreshToken,
+  });
 });
