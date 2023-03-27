@@ -36,7 +36,10 @@ io.on('connection', (socket) => {
     });
 });
 
-app.use(errorsLogger);
+if (process.env.NODE_ENV !== 'production') {
+    app.use(errorsLogger);
+}
+
 app.use(errorsHandler);
 
 server.listen(port, () => console.log(`listening on port ${port}`));
