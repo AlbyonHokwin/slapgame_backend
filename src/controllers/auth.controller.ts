@@ -1,9 +1,12 @@
 import { asyncHandler } from '@/utils/asyncHandler';
+import { ConflictRequestError } from '@/utils/errors';
 import * as User from '../models/user.model';
+import * as RefreshToken from '../models/token.model';
 
 import type { Request, Response } from 'express';
-import type { UserWithPwd } from '@@/types/User';
-import { ConflictRequestError } from '@/utils/errors';
+import type { UserWithId, UserWithPwd } from '@@/types/User';
+import { createAccessToken } from '@/utils/createAccessToken';
+import { verifyAccessToken } from '@/utils/verifyAccessToken';
 
 export const signup = asyncHandler(async (req: Request, res: Response) => {
   const { username, email, password } = req.body;
@@ -14,10 +17,18 @@ export const signup = asyncHandler(async (req: Request, res: Response) => {
     throw new ConflictRequestError('Email is already used');
   }
 
-  const createdUser = await User.create(newUser);
+  const createdUser: UserWithId = await User.create(newUser);
 
-  if (createdUser.id >= 0) {
-    res.status(201).json({ result: { username: createdUser.username, email: createdUser.email } });
+  if (!!createdUser) {
+    const refreshToken = await RefreshToken.create(createdUser.id);
+    const accessToken = await createAccessToken(createdUser.id);
+
+    res.status(201).json({
+      status: 'success',
+      ...createdUser,
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    });
     return;
   }
 
