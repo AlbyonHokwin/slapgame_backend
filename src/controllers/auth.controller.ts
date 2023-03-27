@@ -1,12 +1,12 @@
 import { asyncHandler } from '@/utils/asyncHandler';
-import { ConflictRequestError } from '@/utils/errors';
+import { AuthorizationError, ConflictRequestError } from '@/utils/errors';
+import bcrypt from 'bcrypt';
 import * as User from '../models/user.model';
 import * as RefreshToken from '../models/token.model';
 
 import type { Request, Response } from 'express';
-import type { UserWithId, UserWithPwd } from '@@/types/User';
+import type { FullUser, UserWithId, UserWithPwd } from '@@/types/User';
 import { createAccessToken } from '@/utils/createAccessToken';
-import { verifyAccessToken } from '@/utils/verifyAccessToken';
 
 export const signup = asyncHandler(async (req: Request, res: Response) => {
   const { username, email, password } = req.body;
@@ -19,24 +19,38 @@ export const signup = asyncHandler(async (req: Request, res: Response) => {
 
   const createdUser: UserWithId = await User.create(newUser);
 
-  if (!!createdUser) {
-    const refreshToken = await RefreshToken.create(createdUser.id);
-    const accessToken = await createAccessToken(createdUser.id);
+  const refreshToken = await RefreshToken.create(createdUser.id);
+  const accessToken = await createAccessToken(createdUser.id);
 
-    res.status(201).json({
-      status: 'success',
-      ...createdUser,
-      access_token: accessToken,
-      refresh_token: refreshToken,
-    });
-    return;
-  }
-
-  throw new Error('Creation of new user failed');
+  res.status(201).json({
+    status: 'success',
+    username: createdUser.username,
+    email: createdUser.email,
+    access_token: accessToken,
+    refresh_token: refreshToken,
+  });
 });
 
 export const signin = asyncHandler(async (req: Request, res: Response) => {
-  res.json('signin');
+  const { email, password } = req.body;
+  const user: FullUser | undefined = await User.findOneByEmail(email);
+
+  if (!user) throw new AuthorizationError('Invalid e-mail or password');
+
+  const isCorrectPassword = await bcrypt.compare(password, user.password);
+  if (!isCorrectPassword) throw new AuthorizationError('Invalid e-mail or password');
+
+  await RefreshToken.revokeAllForId(user.id);
+  const refreshToken = await RefreshToken.create(user.id);
+  const accessToken = await createAccessToken(user.id);
+
+  res.status(201).json({
+    status: 'success',
+    username: user.username,
+    email: user.email,
+    access_token: accessToken,
+    refresh_token: refreshToken,
+  });
 });
 
 export const refreshToken = asyncHandler(async (req: Request, res: Response) => {
