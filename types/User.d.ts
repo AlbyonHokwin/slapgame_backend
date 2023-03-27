@@ -12,3 +12,8 @@ export interface UserWithPwd extends User {
 export interface UserWithId extends User {
   id: number;
 }
+
+export interface FullUser extends User {
+  id: number;
+  password: string;
+}
