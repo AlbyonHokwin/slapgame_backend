@@ -5,8 +5,8 @@ type UserId = UserWithId['id'];
 type BaseGameData = {
   hostId: UserId;
   cardDeckId: number;
-  penaltyPrice?: number;
-  strikeNumber?: number;
+  penaltyPrice: number;
+  strikeNumber: number;
 }
 
 type PrivateData<T = boolean> = T extends true ?
@@ -20,11 +20,7 @@ type PrivateData<T = boolean> = T extends true ?
 
 export type GameData = BaseGameData & PrivateData;
 
-type AllIsRequired<T> = {
-  [Property in keyof T]-?: T[Property];
-}
-
-export type Game = AllIsRequired<GameData> & {
+export type Game = GameData & {
   id: number;
   date: Date;
 }
