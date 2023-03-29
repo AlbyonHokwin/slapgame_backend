@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { validate } from '@/validation/validate';
-import { signupSchema, signinSchema, signoutSchema, refreshTokenSchema } from '@/validation/schemas';
+import { signupSchema, signinSchema, signoutSchema, refreshTokenSchema } from '@/validation/auth.schema';
 import { signup, signin, signout, refreshToken } from '@/controllers/auth.controller';
 
 const router = Router();
