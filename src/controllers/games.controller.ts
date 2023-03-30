@@ -5,7 +5,7 @@ import { BadRequestError, FailedValidationError } from '@/utils/errors';
 import * as Game from '../models/game.model';
 
 export const createGame = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-  let { hostId, cardDeckId, penaltyPrice, strikeNumber, isPrivate, password } = req.body;
+  let { hostId, cardDeckId, penaltyPrice, strikeNumber, isPrivate, password, combinations } = req.body;
 
   if (isPrivate) {
     await body('password').exists().withMessage('Password is required for private game').bail()
@@ -14,10 +14,18 @@ export const createGame = asyncHandler(async (req: Request, res: Response, next:
     if (!errors.isEmpty()) next(new FailedValidationError(errors.array()));
   } else password = null;
 
-  const createdGame = await Game.create({ hostId, cardDeckId, penaltyPrice, strikeNumber, isPrivate, password });
-  console.log(createdGame);
+  const createdGame = await Game.create({ hostId, cardDeckId, penaltyPrice, strikeNumber, isPrivate, password, combinations });
 
-  res.json('createGame');
+  res.status(200).json({
+    status: 'success',
+    game: createdGame,
+  });
+});
+
+export const startGame = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+  const { gameId, players } = req.body;
+  console.log(gameId, players);
+  res.json('start game');
 });
 
 export const deleteGame = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {

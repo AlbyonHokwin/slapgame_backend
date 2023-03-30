@@ -11,6 +11,22 @@ export const createGameSchema: ValidationChain[] = [
     .isInt().bail().toInt(),
   body('isPrivate').exists().withMessage('Privacy of the game is not provided').bail()
     .isBoolean().bail().toBoolean(),
+  body('combinations').toArray().customSanitizer((arr: Array<string>) => {
+    const numberArr: number[] = [];
+    arr.forEach(e => {
+      const number = parseInt(e, 10);
+      !isNaN(number) && numberArr.push(number);
+    });
+    return numberArr;
+  }),
+];
+
+export const startGameSchema: ValidationChain[] = [
+  body('gameId').exists().withMessage('No game ID provided').bail()
+    .isInt().bail().toInt(),
+  body('players').isArray({ min: 2 }).withMessage('Need at least 2 players').bail()
+    .custom(players => players.every((player: { id: any; username: any; }) => !!parseInt(player.id, 10) && !!player.username)).withMessage('Please provide an id (-1 if no id) and username for each player').bail()
+    .customSanitizer(players => players.map((player: { id: any; username: any; }) => ({ ...player, id: parseInt(player.id, 10) }))),
 ];
 
 export const deleteGameSchema: ValidationChain[] = [
