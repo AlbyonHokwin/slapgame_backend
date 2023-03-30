@@ -1,4 +1,5 @@
 import type { UserWithId } from './User';
+import type { Player } from './Player';
 
 type UserId = UserWithId['id'];
 
@@ -7,14 +8,15 @@ type BaseGameData = {
   cardDeckId: number;
   penaltyPrice: number;
   strikeNumber: number;
+  combinations: number[];
 }
 
-type PrivateData<T = boolean> = T extends true ?
+type PrivateData =
   {
-    isPrivate: T;
+    isPrivate: true;
     password: string;
-  } : {
-    isPrivate: T;
+  } | {
+    isPrivate: false;
     password: null;
   }
 
@@ -23,4 +25,6 @@ export type GameData = BaseGameData & PrivateData;
 export type Game = GameData & {
   id: number;
   date: Date;
+  isStarted: boolean;
+  players: Player[];
 }
