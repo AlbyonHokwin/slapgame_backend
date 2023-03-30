@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { body, validationResult } from 'express-validator';
 import { asyncHandler } from '@/utils/asyncHandler';
-import { FailedValidationError } from '@/utils/errors';
+import { BadRequestError, FailedValidationError } from '@/utils/errors';
 import * as Game from '../models/game.model';
 
 export const createGame = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
@@ -20,7 +20,11 @@ export const createGame = asyncHandler(async (req: Request, res: Response, next:
   res.json('createGame');
 });
 
-export const getAllGames = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-  const allGames = await Game.getAll();
-  res.json({ allGames });
+export const deleteGame = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+  const id = parseInt(req.params.id, 10);
+
+  const isDelete = await Game.deleteById(id);
+  if (!isDelete) throw new BadRequestError('No game to delete');
+
+  res.status(200).json({ status: 'success' });
 });
