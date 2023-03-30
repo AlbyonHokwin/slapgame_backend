@@ -49,4 +49,10 @@ export class AuthorizationError extends BaseError {
   constructor(message: string = 'Unauthorized') {
     super(401, message);
   }
-}
+};
+
+export class DatabaseError extends BaseError {
+  constructor(message: string = 'Error during database transaction') {
+    super(500, message);
+  }
+};
