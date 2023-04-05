@@ -83,7 +83,7 @@ CREATE TABLE "cards" (
     "suit_color" "card_enum_color" NOT NULL,
     "type" "card_enum_type" NOT NULL,
     CONSTRAINT "card_id_range" CHECK ((("id" >= 1) AND ("id" <= 54))),
-    CONSTRAINT "card_value_int" CHECK ((("value_int" >= 1) AND ("value_int" <= 13)))
+    CONSTRAINT "card_value_int" CHECK ((("value_int" >= 0) AND ("value_int" <= 13)))
 );
 
 CREATE TABLE "cards_card_decks" (

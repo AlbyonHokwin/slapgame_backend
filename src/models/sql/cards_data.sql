@@ -64,6 +64,6 @@ VALUES
   , (52, 13,    'roi',  'king',  'R',  'K', 'piques', 'spades', '♠', 'red',   'face')
 	
     -- JOKERS
-  , (53, NULL, 'joker', 'joker', NULL, NULL, NULL, NULL, '☆',   'red', 'joker')
-  , (54, NULL, 'joker', 'joker', NULL, NULL, NULL, NULL, '★', 'black', 'joker')
+  , (53,  0, 'joker', 'joker', NULL, NULL, NULL, NULL, '☆',   'red', 'joker')
+  , (54,  0, 'joker', 'joker', NULL, NULL, NULL, NULL, '★', 'black', 'joker')
 ;
