@@ -6,5 +6,5 @@ export interface PlayerInfo {
 }
 
 export interface Player extends PlayerInfo {
-  deck: Card['id'][];
+  deck: Card[];
 }
