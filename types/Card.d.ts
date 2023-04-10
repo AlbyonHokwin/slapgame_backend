@@ -25,7 +25,8 @@ export interface Card {
   value: number;
   textEn: Card.Text<'en'>;
   textFr: Card.Text<'fr'>;
-  symbol: Card.Symbol | null;
+  symbolEn: Card.Symbol<'en'> | null;
+  symbolFr: Card.Symbol<'fr'> | null;
   suitEn: Card.Suit<'en'> | null;
   suitFr: Card.Suit<'fr'> | null;
   suitSymbol: Card.SuitSymbol;
