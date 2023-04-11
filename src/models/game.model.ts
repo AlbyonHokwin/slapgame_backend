@@ -1,8 +1,5 @@
 import { db } from './db';
 import type { GameData, Game } from '@@/types/Game';
-import type { PlayerInfo } from '@@/types/Player';
-import type { Deck } from '@@/types/Deck';
-import { dealingCardsToPlayers } from '@/utils/dealingCardsToPlayers';
 import { DatabaseError } from '@/utils/errors';
 
 export const create = async ({ hostId, cardDeckId, penaltyPrice, strikeNumber, isPrivate, password, combinations }: GameData): Promise<Game> => {
