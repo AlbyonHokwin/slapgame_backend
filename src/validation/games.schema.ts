@@ -11,6 +11,8 @@ export const createGameSchema: ValidationChain[] = [
     .isInt().bail().toInt(),
   body('isPrivate').exists().withMessage('Privacy of the game is not provided').bail()
     .isBoolean().bail().toBoolean(),
+  body('maxPlayers').exists().withMessage('No maximum number of players provided').bail()
+    .isInt().bail().toInt(),
   body('combinations').toArray().customSanitizer((arr: Array<string>) => {
     const numberArr: number[] = [];
     arr.forEach(e => {

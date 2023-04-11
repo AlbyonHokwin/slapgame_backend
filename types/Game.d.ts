@@ -8,6 +8,7 @@ type BaseGameData = {
   cardDeckId: number;
   penaltyPrice: number;
   strikeNumber: number;
+  maxPlayers: number;
   combinations: number[];
 }
 

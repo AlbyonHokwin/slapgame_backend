@@ -2,18 +2,18 @@ import { db } from './db';
 import type { GameData, Game } from '@@/types/Game';
 import { DatabaseError } from '@/utils/errors';
 
-export const create = async ({ hostId, cardDeckId, penaltyPrice, strikeNumber, isPrivate, password, combinations }: GameData): Promise<Game> => {
+export const create = async ({ hostId, cardDeckId, penaltyPrice, strikeNumber, isPrivate, password, maxPlayers, combinations }: GameData): Promise<Game> => {
   const client = await db.connect();
 
   try {
     await client.query('BEGIN');
 
     const statement = `
-      INSERT INTO games (host_id, card_deck_id, penalty_price, strike_number, is_private, password)
-        VALUES ($1, $2, $3, $4, $5, $6)
-        RETURNING id, host_id AS "hostId", date,card_deck_id AS "cardDeckId", penalty_price AS "penaltyPrice", strike_number AS "strikeNumber", is_private AS "isPrivate", password, is_started AS "isStarted"
+      INSERT INTO games (host_id, card_deck_id, penalty_price, strike_number, is_private, password, max_players)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        RETURNING id, host_id AS "hostId", date,card_deck_id AS "cardDeckId", penalty_price AS "penaltyPrice", strike_number AS "strikeNumber", is_private AS "isPrivate", password, max_players AS "maxPlayers", is_started AS "isStarted"
     `;
-    const values = [hostId, cardDeckId, penaltyPrice, strikeNumber, isPrivate, password];
+    const values = [hostId, cardDeckId, penaltyPrice, strikeNumber, isPrivate, password, maxPlayers];
 
     const results = await client.query(statement, values);
     const createdGame: Omit<Game, 'combinations' | 'players'> = results.rows[0];

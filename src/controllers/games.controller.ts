@@ -9,7 +9,7 @@ import type { PlayerInfo } from '@@/types/Player';
 import { dealingCardsToPlayers } from '@/utils/dealingCardsToPlayers';
 
 export const createGame = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-  let { hostId, cardDeckId, penaltyPrice, strikeNumber, isPrivate, password, combinations } = req.body;
+  let { hostId, cardDeckId, penaltyPrice, strikeNumber, isPrivate, password, maxPlayers, combinations } = req.body;
 
   if (isPrivate) {
     await body('password').exists().withMessage('Password is required for private game').bail()
@@ -18,7 +18,7 @@ export const createGame = asyncHandler(async (req: Request, res: Response, next:
     if (!errors.isEmpty()) next(new FailedValidationError(errors.array()));
   } else password = null;
 
-  const createdGame = await Game.create({ hostId, cardDeckId, penaltyPrice, strikeNumber, isPrivate, password, combinations });
+  const createdGame = await Game.create({ hostId, cardDeckId, penaltyPrice, strikeNumber, isPrivate, password, maxPlayers, combinations });
 
   res.status(200).json({
     status: 'success',
@@ -32,6 +32,7 @@ export const startGame = asyncHandler(async (req: Request, res: Response, next: 
   const game = await Game.findOneById(gameId);
   if (!game) throw new BadRequestError('No game found');
   if (game.isStarted) throw new BadRequestError('Game already started');
+  if (playersInfo.length > game.maxPlayers) throw new BadRequestError('Too many players for this game');
 
   let deck = await Card.findDeck(game.cardDeckId);
   if (!deck) throw new DatabaseError('No valid card deck used in game data');
