@@ -17,16 +17,16 @@ export const create = async ({ username, email, password }: UserWithPwd): Promis
   }
 };
 
-export const findOneById = async (id: UserWithId['id']): Promise<UserWithId | undefined> => {
+export const findOneById = async (id: UserWithId['id']): Promise<UserWithId | null> => {
   const statement = 'SELECT id, username, email FROM users WHERE id = $1 LIMIT 1';
   const values = [id];
 
   try {
     const results = await db.query(statement, values);
 
-    let foundUser: UserWithId | undefined = undefined;
+    if (results.rows.length === 0) return null;
 
-    results.rows.length > 0 && (foundUser = results.rows[0]);
+    const foundUser: UserWithId = results.rows[0];
 
     return foundUser;
   } catch (error) {
