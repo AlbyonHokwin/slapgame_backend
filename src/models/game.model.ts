@@ -107,14 +107,15 @@ export const findOneById = async (id: Game['id']): Promise<Game | null> => {
   }
 }
 
-export const findAllPublic = async (): Promise<Game[] | null> => {
+export const findAllJoinable = async ({ isPrivate = false }: { isPrivate: boolean }): Promise<Game[] | null> => {
   const statement = `
     SELECT * FROM games_vw
-    WHERE isPrivate = false AND isStarted = false
+    WHERE isPrivate = $1 AND isStarted = false
   `;
+  const value = [isPrivate];
 
   try {
-    const results = await db.query(statement);
+    const results = await db.query(statement, value);
 
     if (results.rows.length === 0) return null;
 
