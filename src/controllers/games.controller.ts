@@ -49,7 +49,6 @@ export const startGame = asyncHandler(async (req: Request, res: Response, next: 
   game.players = dealingCardsToPlayers(checkedPlayersInfo, deck);
 
   await Game.start(game);
-  console.log(game);
 
   res.status(201).json({
     status: 'success',
