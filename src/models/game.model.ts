@@ -57,12 +57,12 @@ export const start = async (game: Game) => {
       userId === -1 && (userId = null);
 
       const insertCardStatement = `
-        INSERT INTO player_decks (user_id, game_id, card_id, card_position)
-          VALUES ($1, $2, $3, $4); 
+        INSERT INTO player_decks (user_id, username, game_id, card_id, card_position)
+          VALUES ($1, $2, $3, $4, $5); 
       `;
 
       await Promise.all(player.deck.map(async (card, cardIndex) => {
-        const insertCardValues = [userId, game.id, card.id, cardIndex];
+        const insertCardValues = [userId, player.username, game.id, card.id, cardIndex];
         await client.query(insertCardStatement, insertCardValues);
       }));
     });
