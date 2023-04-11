@@ -47,12 +47,6 @@ export const create = async ({ hostId, cardDeckId, penaltyPrice, strikeNumber, i
 }
 
 export const start = async (game: Game) => {
-  // players.forEach(player => {
-  //   console.log('id: ', player.id, player.username);
-  //   const playerDeck = [...player.deck].sort((a, b) => a.id - b.id);
-  //   console.table(playerDeck);
-  // })
-
   const client = await db.connect();
 
   try {
