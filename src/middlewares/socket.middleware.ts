@@ -22,17 +22,17 @@ export const handshakeRoomId: MiddlewareSocket = async (socket, next) => {
   if (!roomId) {
     let tempRoomId = uuidv4();
     while (true) {
-      const socketsInRoom = await io.in(`room-${tempRoomId}`).fetchSockets();
+      const socketsInRoom = await io.in(tempRoomId).fetchSockets();
       if (socketsInRoom.length === 0) break;
       tempRoomId = uuidv4();
     }
-    socket.data.room = `room-${tempRoomId}`;
+    socket.data.room = tempRoomId;
     return next();
   }
 
-  const socketsInRoom = await io.in(`room-${roomId}`).fetchSockets();
+  const socketsInRoom = await io.in(roomId).fetchSockets();
   if (socketsInRoom.length === 0) return next(new Error('This room Id doesn\'t exist'));
 
-  socket.data.room = `room-${roomId}`;
+  socket.data.room = roomId;
   next();
 };
